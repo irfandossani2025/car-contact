@@ -9,7 +9,7 @@
             @if (session('status'))
                 <div class="rounded-xl bg-green-50 border border-green-200 text-green-800 p-3 text-sm">{{ session('status') }}</div>
             @endif
-            @if ($errors->any())
+            @if ($errors->any() && ! $errors->hasAny(['phone', 'code']))
                 <div class="rounded-xl bg-red-50 border border-red-200 text-red-800 p-3 text-sm">{{ $errors->first() }}</div>
             @endif
 
@@ -27,9 +27,9 @@
             {{-- ===== How you'll be alerted ===== --}}
             <section class="bg-white shadow-sm rounded-2xl p-6">
                 <h3 class="text-lg font-semibold">How you'll be alerted</h3>
-                <p class="text-sm text-gray-500">All free. Turn on at least one instant option.</p>
+                <p class="text-sm text-gray-500">Turn on at least one instant option (phone, SMS or Telegram).</p>
 
-                <div class="mt-4 grid gap-4 md:grid-cols-3">
+                <div class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {{-- Phone push --}}
                     <div class="rounded-xl border p-4" x-data="pushManager(@js(config('contactscan.vapid.public_key')), @js(route('push.subscribe')), @js(route('push.unsubscribe')))">
                         <div class="flex items-center justify-between">
@@ -71,6 +71,54 @@
                                     <form method="POST" action="{{ route('push.removeAll') }}">@csrf<button class="underline text-gray-500">Remove all devices</button></form>
                                 </div>
                             @endif
+                        @endif
+                    </div>
+
+                    {{-- SMS --}}
+                    <div class="rounded-xl border p-4">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-medium">💬 SMS text</h4>
+                            <span class="text-xs rounded-full px-2 py-0.5 {{ $user->canReceiveSms() ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600' }}">
+                                {{ $user->canReceiveSms() ? 'On' : 'Off' }}
+                            </span>
+                        </div>
+                        @if (! $smsEnabled)
+                            <p class="mt-2 text-sm text-gray-500">Not configured on the server yet.</p>
+                        @elseif ($user->phone_verified_at)
+                            <p class="mt-3 text-sm text-gray-600">Texts go to <strong class="whitespace-nowrap">{{ $user->maskedPhone() }}</strong>. Works on any phone, no app needed.</p>
+                            <div class="mt-3 grid gap-2">
+                                <form method="POST" action="{{ route('sms.toggle') }}">@csrf
+                                    <button class="w-full rounded-lg {{ $user->notify_sms ? 'border border-gray-300' : 'bg-gray-900 text-white' }} px-3 py-2 text-sm font-semibold">
+                                        {{ $user->notify_sms ? 'Turn off SMS' : 'Turn on SMS' }}
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="mt-3 flex gap-3 text-xs">
+                                @if ($user->notify_sms)
+                                    <form method="POST" action="{{ route('sms.test') }}">@csrf<button class="underline text-gray-700">Send test</button></form>
+                                @endif
+                                <form method="POST" action="{{ route('sms.remove') }}">@csrf<button class="underline text-gray-500">Change number</button></form>
+                            </div>
+                        @elseif ($user->phone && $user->phone_verify_expires_at?->isFuture())
+                            <p class="mt-3 text-sm text-gray-600">Enter the 6-digit code we texted to <strong class="whitespace-nowrap">{{ $user->maskedPhone() }}</strong>.</p>
+                            <form method="POST" action="{{ route('sms.verify') }}" class="mt-3 flex gap-2">
+                                @csrf
+                                <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}" required placeholder="123456"
+                                       class="w-full rounded-lg border-gray-300 text-center tracking-widest focus:border-gray-900 focus:ring-gray-900">
+                                <button class="rounded-lg bg-gray-900 text-white px-3 text-sm font-semibold">Verify</button>
+                            </form>
+                            @error('code')<p class="mt-2 text-xs text-red-700">{{ $message }}</p>@enderror
+                            <form method="POST" action="{{ route('sms.remove') }}" class="mt-2">@csrf<button class="text-xs underline text-gray-500">Use a different number</button></form>
+                        @else
+                            <p class="mt-3 text-sm text-gray-600">Get a text message on any phone. We'll send a code to confirm the number.</p>
+                            <form method="POST" action="{{ route('sms.phone') }}" class="mt-3 grid gap-2">
+                                @csrf
+                                <input name="phone" type="tel" inputmode="tel" autocomplete="tel" required value="{{ old('phone') }}" placeholder="+971 50 123 4567"
+                                       class="w-full rounded-lg border-gray-300 focus:border-gray-900 focus:ring-gray-900">
+                                <button class="w-full rounded-lg bg-gray-900 text-white px-3 py-2 text-sm font-semibold">Send code</button>
+                            </form>
+                            @error('phone')<p class="mt-2 text-xs text-red-700">{{ $message }}</p>@enderror
+                            <p class="mt-2 text-xs text-gray-500">Your number is never shown to the person who scans.</p>
                         @endif
                     </div>
 

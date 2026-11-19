@@ -19,12 +19,14 @@ class User extends Authenticatable
         'email',
         'password',
         'notify_email',
+        'notify_sms',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
         'telegram_link_token',
+        'phone_verify_code',
     ];
 
     protected function casts(): array
@@ -33,6 +35,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'notify_email' => 'boolean',
+            'notify_sms' => 'boolean',
+            'phone_verified_at' => 'datetime',
+            'phone_verify_expires_at' => 'datetime',
         ];
     }
 
@@ -54,6 +59,21 @@ class User extends Authenticatable
     public function blockedSenders(): HasMany
     {
         return $this->hasMany(BlockedSender::class);
+    }
+
+    public function canReceiveSms(): bool
+    {
+        return $this->notify_sms && filled($this->phone) && $this->phone_verified_at !== null;
+    }
+
+    /** "+97150•••••67" for display. */
+    public function maskedPhone(): ?string
+    {
+        if (! $this->phone) {
+            return null;
+        }
+
+        return substr($this->phone, 0, 6).str_repeat('•', max(0, strlen($this->phone) - 8)).substr($this->phone, -2);
     }
 
     public function hasTelegram(): bool

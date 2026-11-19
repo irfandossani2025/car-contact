@@ -40,6 +40,7 @@ class Alert extends Model
     {
         static::creating(function (Alert $alert) {
             $alert->public_token ??= Str::random(32);
+            $alert->owner_token ??= Str::random(12);
         });
     }
 
@@ -67,6 +68,12 @@ class Alert extends Model
     public function ownerUrl(): string
     {
         return URL::temporarySignedRoute('owner.alert', now()->addDays(7), ['alert' => $this->id]);
+    }
+
+    /** Short owner link for SMS. The random token itself is the key. */
+    public function shortOwnerUrl(): string
+    {
+        return route('owner.short', $this->owner_token);
     }
 
     public function ownerReplyUrl(string $reply): string

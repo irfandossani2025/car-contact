@@ -28,6 +28,15 @@ class OwnerAlertController extends Controller
         ]);
     }
 
+    /** Short link from SMS: /o/{token} -> the signed owner page. */
+    public function short(string $token): RedirectResponse
+    {
+        $alert = Alert::where('owner_token', $token)->firstOrFail();
+        abort_if($alert->created_at->lt(now()->subDays(7)), 410);
+
+        return redirect($alert->ownerUrl());
+    }
+
     public function reply(Request $request, Alert $alert, string $reply): RedirectResponse|JsonResponse
     {
         abort_unless(array_key_exists($reply, Alert::REPLIES), 404);

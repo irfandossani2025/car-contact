@@ -78,7 +78,7 @@ TURNSTILE_SITE_KEY=
 TURNSTILE_SECRET_KEY=
 ```
 
-Then in **Laravel Toolkit → Artisan**, run:
+After each deploy that adds database changes, and the first time, run in **Laravel Toolkit → Artisan**:
 - `key:generate` (first install only)
 - `migrate --force`
 - `optimize`
@@ -100,6 +100,23 @@ script `httpdocs/<app folder>/artisan`, arguments `schedule:run`, run **every mi
 3. Laravel Toolkit → Artisan → run `optimize`, then `contactscan:telegram-webhook`.
    It should say *Telegram webhook set to https://park.yourdomain.com/telegram/webhook*.
 4. Optional: in BotFather, use `/setuserpic` and `/setdescription` to brand the bot.
+
+## 5b. SMS via BulkSMS (paid per message)
+
+1. In BulkSMS → Settings → **API Tokens**, copy the **Token ID** and **Token Secret**.
+2. In the Laravel Toolkit `.env` editor set:
+   ```dotenv
+   BULKSMS_TOKEN_ID=your-token-id
+   BULKSMS_TOKEN_SECRET=your-token-secret
+   # or, instead of the two lines above:
+   # BULKSMS_BASIC_AUTH=the-basic-auth-string
+   BULKSMS_FROM=            # optional approved sender ID
+   CS_SMS_DEFAULT_COUNTRY_CODE=971   # optional: lets owners type 050... instead of +97150...
+   CS_SMS_DAILY_LIMIT=10    # max SMS per owner per day (cost guard)
+   ```
+3. Artisan → `optimize`.
+4. Owners turn SMS on from the dashboard. They confirm their number with a 6-digit SMS code first.
+   Alert texts are kept to one SMS (under 160 characters) with a short reply link.
 
 ## 6. Cloudflare Turnstile (free bot protection, optional but recommended)
 

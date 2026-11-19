@@ -5,6 +5,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OwnerAlertController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScanController;
+use App\Http\Controllers\SmsSettingsController;
 use App\Http\Controllers\TelegramWebhookController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,8 @@ Route::middleware('signed')->group(function () {
     Route::post('/a/{alert}/block', [OwnerAlertController::class, 'block'])->name('owner.alert.block');
 });
 
+Route::get('/o/{token}', [OwnerAlertController::class, 'short'])->middleware('throttle:30,1')->name('owner.short');
+
 // --- Telegram bot webhook ---
 Route::post('/telegram/webhook', TelegramWebhookController::class)->name('telegram.webhook');
 
@@ -49,6 +52,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/push/remove-all', [NotificationController::class, 'removeAllPush'])->name('push.removeAll');
     Route::get('/notifications/telegram/connect', [NotificationController::class, 'connectTelegram'])->name('telegram.connect');
     Route::post('/notifications/telegram/disconnect', [NotificationController::class, 'disconnectTelegram'])->name('telegram.disconnect');
+    Route::post('/notifications/sms/phone', [SmsSettingsController::class, 'savePhone'])->middleware('throttle:6,1')->name('sms.phone');
+    Route::post('/notifications/sms/verify', [SmsSettingsController::class, 'verify'])->middleware('throttle:10,1')->name('sms.verify');
+    Route::post('/notifications/sms/toggle', [SmsSettingsController::class, 'toggle'])->name('sms.toggle');
+    Route::post('/notifications/sms/test', [SmsSettingsController::class, 'test'])->middleware('throttle:3,10')->name('sms.test');
+    Route::post('/notifications/sms/remove', [SmsSettingsController::class, 'remove'])->name('sms.remove');
     Route::post('/notifications/email', [NotificationController::class, 'updateEmail'])->name('email.update');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
