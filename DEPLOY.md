@@ -35,7 +35,12 @@ git add -A && git commit -m "Build assets" && git push
    - ❌ **npm / Node build: turn it off.** The built files are already in git.
    - ✅ Clear and rebuild cache (`optimize`)
 
-## 3. Fill in `.env` (Laravel Toolkit → Environment / .env)
+## 3. Fill in `.env`
+
+> ⚠️ On this server the Laravel Toolkit's **Edit .env** button did not save. Edit the file with
+> **Plesk → Files → `carcontact.techittechnologies.com/.env` → Code Editor → Save** instead.
+> After any `.env` change, run `optimize` in the Artisan tab, otherwise the old cached settings stay in use.
+> Check the result with `contactscan:status` (prints yes/no only, never secrets).
 
 ```dotenv
 APP_NAME="Contact Scan"
@@ -141,6 +146,8 @@ script `httpdocs/<app folder>/artisan`, arguments `schedule:run`, run **every mi
 
 | Problem | Fix |
 |---|---|
+| Settings change has no effect | Run `optimize` in Artisan (settings are cached). Check with `contactscan:status`. |
+| `Specified key was too long` on migrate | Server runs MariaDB 10.1. Already handled in code (191-char strings); pull the latest and deploy. |
 | Page is unstyled | `public/build` wasn't committed. Run `npm run build` locally, then commit and push. |
 | 500 error | Toolkit → Logs, or open `storage/logs/laravel.log` in File Manager. Run `optimize:clear`. |
 | No emails | Check the MAIL_* settings. Try port 465 + `MAIL_SCHEME=smtps`. Check the mailbox password. |
