@@ -35,7 +35,7 @@ return new class extends Migration
             $table->string('reply', 30)->nullable();
             $table->timestamp('seen_at')->nullable();
             $table->timestamp('replied_at')->nullable();
-            $table->json('delivery')->nullable();
+            $table->text('delivery')->nullable(); // text, not json: MariaDB 10.1 has no JSON type
             $table->timestamps();
             $table->index(['vehicle_id', 'created_at']);
         });
