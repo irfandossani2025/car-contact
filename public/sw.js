@@ -16,8 +16,8 @@ self.addEventListener('push', (event) => {
     event.waitUntil(
         self.registration.showNotification(data.title || 'Someone needs you to move your car', {
             body: data.body || '',
-            icon: '/icons/icon-192.png',
-            badge: '/icons/badge-96.png',
+            icon: '/app-icons/icon-192.png',
+            badge: '/app-icons/badge-96.png',
             tag: data.tag,
             renotify: true,
             requireInteraction: true,
@@ -37,7 +37,7 @@ self.addEventListener('notificationclick', (event) => {
     if (action && action.url) {
         event.waitUntil(
             fetch(action.url, { method: 'POST', headers: { Accept: 'application/json' }, credentials: 'omit' })
-                .then(() => self.registration.showNotification('Reply sent ✅', { body: action.title, tag: data.tag, icon: '/icons/icon-192.png' }))
+                .then(() => self.registration.showNotification('Reply sent ✅', { body: action.title, tag: data.tag, icon: '/app-icons/icon-192.png' }))
                 .catch(() => self.clients.openWindow(data.url || '/dashboard'))
         );
         return;
