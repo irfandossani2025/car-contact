@@ -40,3 +40,21 @@ Artisan::command('contactscan:prune', function () {
 })->purpose('Delete alerts older than 90 days');
 
 \Illuminate\Support\Facades\Schedule::command('contactscan:prune')->daily();
+
+// Quick health check (prints yes/no only, never secrets). Run from Plesk > Laravel Toolkit > Artisan.
+Artisan::command('contactscan:status', function () {
+    $yn = fn ($v) => $v ? 'yes' : 'NO';
+    $this->line('Environment ....... '.app()->environment().(config('app.debug') ? ' (DEBUG ON!)' : ''));
+    $this->line('App URL ........... '.config('app.url'));
+    try {
+        \Illuminate\Support\Facades\DB::connection()->getPdo();
+        $this->line('Database .......... '.config('database.default').' connected, '.\App\Models\User::count().' users');
+    } catch (\Throwable $e) {
+        $this->line('Database .......... FAILED: '.$e->getMessage());
+    }
+    $this->line('Phone push ........ '.$yn(app(\App\Services\WebPushNotifier::class)->isConfigured()));
+    $this->line('SMS (BulkSMS) ..... '.$yn(app(\App\Services\SmsNotifier::class)->isConfigured()));
+    $this->line('Telegram .......... '.$yn(app(\App\Services\TelegramNotifier::class)->isConfigured()));
+    $this->line('Email ............. '.config('mail.default').' via '.config('mail.mailers.smtp.host').':'.config('mail.mailers.smtp.port'));
+    $this->line('Turnstile ......... '.$yn(app(\App\Services\TurnstileVerifier::class)->enabled()));
+})->purpose('Show which alert channels are configured');
