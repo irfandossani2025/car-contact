@@ -24,7 +24,7 @@
             {{ $slot }}
         </main>
         <footer class="px-4 py-6 text-center text-xs text-gray-500">
-            The owner's phone number and email are never shown.
+            The owner's phone number and email are never shown. · <a href="{{ route('privacy') }}" class="underline">Privacy</a>
         </footer>
     </div>
 </body>

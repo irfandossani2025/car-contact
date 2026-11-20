@@ -13,6 +13,7 @@ use App\Http\Controllers\WhatsAppWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
+Route::view('/privacy', 'privacy')->name('privacy');
 
 // --- Public: the person who scans the QR code ---
 Route::get('/t/{code}', [ScanController::class, 'show'])->name('scan.show');

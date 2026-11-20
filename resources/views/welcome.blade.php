@@ -77,6 +77,6 @@
         </section>
     </main>
 
-    <footer class="text-center text-sm text-gray-500 py-8">© {{ date('Y') }} {{ config('app.name', 'Contact Scan') }}</footer>
+    <footer class="text-center text-sm text-gray-500 py-8">© {{ date('Y') }} {{ config('app.name', 'Contact Scan') }} · <a href="{{ route('privacy') }}" class="underline">Privacy</a></footer>
 </body>
 </html>
