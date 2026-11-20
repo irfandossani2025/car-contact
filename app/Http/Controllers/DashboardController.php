@@ -6,12 +6,13 @@ use App\Services\QrCodeService;
 use App\Services\SmsNotifier;
 use App\Services\TelegramNotifier;
 use App\Services\WebPushNotifier;
+use App\Services\WhatsAppNotifier;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request, QrCodeService $qr, WebPushNotifier $push, TelegramNotifier $telegram, SmsNotifier $sms): View
+    public function __invoke(Request $request, QrCodeService $qr, WebPushNotifier $push, TelegramNotifier $telegram, SmsNotifier $sms, WhatsAppNotifier $whatsapp): View
     {
         $user = $request->user();
         $vehicles = $user->vehicles()->withCount('alerts')->orderBy('id')->get();
@@ -26,6 +27,7 @@ class DashboardController extends Controller
             'pushCount' => $user->pushSubscriptions()->count(),
             'telegramEnabled' => $telegram->isConfigured(),
             'smsEnabled' => $sms->isConfigured(),
+            'whatsappEnabled' => $whatsapp->isConfigured(),
         ]);
     }
 }

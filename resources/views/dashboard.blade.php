@@ -27,9 +27,9 @@
             {{-- ===== How you'll be alerted ===== --}}
             <section class="bg-white shadow-sm rounded-2xl p-6">
                 <h3 class="text-lg font-semibold">How you'll be alerted</h3>
-                <p class="text-sm text-gray-500">Turn on at least one instant option (phone, SMS or Telegram).</p>
+                <p class="text-sm text-gray-500">Turn on at least one instant option (phone, WhatsApp, SMS or Telegram).</p>
 
-                <div class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {{-- Phone push --}}
                     <div class="rounded-xl border p-4" x-data="pushManager(@js(config('contactscan.vapid.public_key')), @js(route('push.subscribe')), @js(route('push.unsubscribe')))">
                         <div class="flex items-center justify-between">
@@ -71,6 +71,37 @@
                                     <form method="POST" action="{{ route('push.removeAll') }}">@csrf<button class="underline text-gray-500">Remove all devices</button></form>
                                 </div>
                             @endif
+                        @endif
+                    </div>
+
+                    {{-- WhatsApp --}}
+                    <div class="rounded-xl border p-4">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-medium">🟢 WhatsApp</h4>
+                            <span class="text-xs rounded-full px-2 py-0.5 {{ $user->canReceiveWhatsApp() ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600' }}">
+                                {{ $user->canReceiveWhatsApp() ? 'On' : ($user->whatsapp_number ? 'Paused' : 'Off') }}
+                            </span>
+                        </div>
+                        @if (! $whatsappEnabled)
+                            <p class="mt-2 text-sm text-gray-500">Not configured on the server yet.</p>
+                        @elseif ($user->whatsapp_number)
+                            <p class="mt-3 text-sm text-gray-600">Alerts go to <strong class="whitespace-nowrap">{{ $user->maskedWhatsApp() }}</strong> with one-tap reply buttons.</p>
+                            <form method="POST" action="{{ route('whatsapp.toggle') }}" class="mt-3">@csrf
+                                <button class="w-full rounded-lg {{ $user->notify_whatsapp ? 'border border-gray-300' : 'bg-gray-900 text-white' }} px-3 py-2 text-sm font-semibold">
+                                    {{ $user->notify_whatsapp ? 'Pause WhatsApp' : 'Resume WhatsApp' }}
+                                </button>
+                            </form>
+                            <div class="mt-3 flex gap-3 text-xs">
+                                @if ($user->notify_whatsapp)
+                                    <form method="POST" action="{{ route('whatsapp.test') }}">@csrf<button class="underline text-gray-700">Send test</button></form>
+                                @endif
+                                <form method="POST" action="{{ route('whatsapp.disconnect') }}">@csrf<button class="underline text-gray-500">Disconnect</button></form>
+                            </div>
+                        @else
+                            <p class="mt-3 text-sm text-gray-600">Opens WhatsApp with a short message. Just tap <strong>Send</strong> to connect your number.</p>
+                            <a href="{{ route('whatsapp.connect') }}" target="_blank" rel="noopener"
+                               class="mt-3 block text-center w-full rounded-lg bg-green-600 text-white px-3 py-2 text-sm font-semibold">Connect WhatsApp</a>
+                            <p class="mt-2 text-xs text-gray-500">After sending, reload this page.</p>
                         @endif
                     </div>
 

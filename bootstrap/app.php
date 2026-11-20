@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->validateCsrfTokens(except: [
             'telegram/webhook',
+            'whatsapp/webhook',
             // Signed one-tap replies posted by the service worker (signature protects them).
             'a/*/reply/*',
         ]);

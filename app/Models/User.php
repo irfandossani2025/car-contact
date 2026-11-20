@@ -20,6 +20,7 @@ class User extends Authenticatable
         'password',
         'notify_email',
         'notify_sms',
+        'notify_whatsapp',
     ];
 
     protected $hidden = [
@@ -27,6 +28,7 @@ class User extends Authenticatable
         'remember_token',
         'telegram_link_token',
         'phone_verify_code',
+        'whatsapp_link_code',
     ];
 
     protected function casts(): array
@@ -36,6 +38,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'notify_email' => 'boolean',
             'notify_sms' => 'boolean',
+            'notify_whatsapp' => 'boolean',
             'phone_verified_at' => 'datetime',
             'phone_verify_expires_at' => 'datetime',
         ];
@@ -74,6 +77,18 @@ class User extends Authenticatable
         }
 
         return substr($this->phone, 0, 6).str_repeat('•', max(0, strlen($this->phone) - 8)).substr($this->phone, -2);
+    }
+
+    public function canReceiveWhatsApp(): bool
+    {
+        return $this->notify_whatsapp && filled($this->whatsapp_number);
+    }
+
+    public function maskedWhatsApp(): ?string
+    {
+        $n = $this->whatsapp_number;
+
+        return $n ? substr($n, 0, 6).str_repeat('•', max(0, strlen($n) - 8)).substr($n, -2) : null;
     }
 
     public function hasTelegram(): bool

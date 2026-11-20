@@ -33,6 +33,20 @@ return [
         'daily_limit_per_user' => (int) env('CS_SMS_DAILY_LIMIT', 10),
     ],
 
+    // WhatsApp via Meta Cloud API (paid per alert; connecting and replies are free).
+    'whatsapp' => [
+        'access_token' => env('WHATSAPP_ACCESS_TOKEN'),
+        'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
+        // Your WhatsApp business number in international format, e.g. +97150xxxxxxx (for the Connect link)
+        'business_number' => env('WHATSAPP_BUSINESS_NUMBER'),
+        'app_secret' => env('WHATSAPP_APP_SECRET'),
+        'verify_token' => env('WHATSAPP_VERIFY_TOKEN'),
+        'template_name' => env('WHATSAPP_TEMPLATE', 'car_alert'),
+        'template_language' => env('WHATSAPP_TEMPLATE_LANG', 'en'),
+        'graph_version' => env('WHATSAPP_GRAPH_VERSION', 'v23.0'),
+        'daily_limit_per_user' => (int) env('CS_WHATSAPP_DAILY_LIMIT', 10),
+    ],
+
     // Free Cloudflare Turnstile (bot check). Leave blank to disable.
     'turnstile' => [
         'site_key' => env('TURNSTILE_SITE_KEY'),

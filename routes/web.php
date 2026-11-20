@@ -8,6 +8,8 @@ use App\Http\Controllers\ScanController;
 use App\Http\Controllers\SmsSettingsController;
 use App\Http\Controllers\TelegramWebhookController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\WhatsAppSettingsController;
+use App\Http\Controllers\WhatsAppWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
@@ -35,6 +37,10 @@ Route::get('/o/{token}', [OwnerAlertController::class, 'short'])->middleware('th
 // --- Telegram bot webhook ---
 Route::post('/telegram/webhook', TelegramWebhookController::class)->name('telegram.webhook');
 
+// --- WhatsApp (Meta Cloud API) webhook ---
+Route::get('/whatsapp/webhook', [WhatsAppWebhookController::class, 'verify'])->name('whatsapp.webhook.verify');
+Route::post('/whatsapp/webhook', [WhatsAppWebhookController::class, 'receive'])->name('whatsapp.webhook');
+
 // --- Owner dashboard ---
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
@@ -57,6 +63,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/sms/toggle', [SmsSettingsController::class, 'toggle'])->name('sms.toggle');
     Route::post('/notifications/sms/test', [SmsSettingsController::class, 'test'])->middleware('throttle:3,10')->name('sms.test');
     Route::post('/notifications/sms/remove', [SmsSettingsController::class, 'remove'])->name('sms.remove');
+    Route::get('/notifications/whatsapp/connect', [WhatsAppSettingsController::class, 'connect'])->name('whatsapp.connect');
+    Route::post('/notifications/whatsapp/toggle', [WhatsAppSettingsController::class, 'toggle'])->name('whatsapp.toggle');
+    Route::post('/notifications/whatsapp/test', [WhatsAppSettingsController::class, 'test'])->middleware('throttle:3,10')->name('whatsapp.test');
+    Route::post('/notifications/whatsapp/disconnect', [WhatsAppSettingsController::class, 'disconnect'])->name('whatsapp.disconnect');
     Route::post('/notifications/email', [NotificationController::class, 'updateEmail'])->name('email.update');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

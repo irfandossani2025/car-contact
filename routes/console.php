@@ -54,6 +54,7 @@ Artisan::command('contactscan:status', function () {
     }
     $this->line('Phone push ........ '.$yn(app(\App\Services\WebPushNotifier::class)->isConfigured()));
     $this->line('SMS (BulkSMS) ..... '.$yn(app(\App\Services\SmsNotifier::class)->isConfigured()));
+    $this->line('WhatsApp .......... '.$yn(app(\App\Services\WhatsAppNotifier::class)->isConfigured()).(config('contactscan.whatsapp.app_secret') && config('contactscan.whatsapp.verify_token') ? ', webhook keys set' : ', webhook keys MISSING'));
     $this->line('Telegram .......... '.$yn(app(\App\Services\TelegramNotifier::class)->isConfigured()));
     $this->line('Email ............. '.config('mail.default').' via '.config('mail.mailers.smtp.host').':'.config('mail.mailers.smtp.port'));
     $this->line('Turnstile ......... '.$yn(app(\App\Services\TurnstileVerifier::class)->enabled()));

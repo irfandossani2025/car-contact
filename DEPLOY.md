@@ -123,6 +123,15 @@ script `httpdocs/<app folder>/artisan`, arguments `schedule:run`, run **every mi
 4. Owners turn SMS on from the dashboard. They confirm their number with a 6-digit SMS code first.
    Alert texts are kept to one SMS (under 160 characters) with a short reply link.
 
+## 5c. WhatsApp via Meta Cloud API
+
+- Webhook URL: `https://carcontact.techittechnologies.com/whatsapp/webhook`, verify token = `WHATSAPP_VERIFY_TOKEN`, subscribe to the **messages** field.
+- Message template `car_alert` (Utility, English) with body variables {{1}} car, {{2}} reason, {{3}} note,
+  and three quick-reply buttons in this order: *On my way (5 min)*, *Car moved*, *Can't come now*.
+- `.env`: `WHATSAPP_ACCESS_TOKEN` (permanent System User token), `WHATSAPP_PHONE_NUMBER_ID`,
+  `WHATSAPP_BUSINESS_NUMBER` (+international), `WHATSAPP_APP_SECRET` (App settings → Basic). Then `optimize`.
+- Owners tap **Connect WhatsApp** → WhatsApp opens with `CONNECT <code>` → Send. Replies come back as button taps.
+
 ## 6. Cloudflare Turnstile (free bot protection, optional but recommended)
 
 1. dash.cloudflare.com → **Turnstile → Add site** → add your subdomain → Widget mode: *Managed*.
